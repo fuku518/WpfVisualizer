@@ -4,7 +4,7 @@
         xmlns:cp="http://schemas.charlespetzold.com/2007/xaml"
         xmlns:_3DTools="clr-namespace:_3DTools;assembly=3DTools"
         xmlns:local="clr-namespace:WpfVisualizer"
-        Title="MainWindow" Height="600" Width="800" KeyDown="OnKeyDown">
+        Title="MainWindow" Height="600" Width="800" KeyDown="OnKeyDown" Closed="Window_Closed">
     <Grid x:Name ="Wheel" Background="Transparent" MouseWheel="OnMouseWheel">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
