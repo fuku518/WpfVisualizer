@@ -20,9 +20,18 @@ namespace WpfVisualizer
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static string _temporaryImageStoreFolder;
+
         public MainWindow()
         {
             InitializeComponent();
+            
+            //Create temporary image store folder
+            var temp = Path.GetTempFileName();
+            File.Delete(temp);
+            Directory.CreateDirectory(temp);
+            _temporaryImageStoreFolder = temp;
+            Debug.WriteLine(_temporaryImageStoreFolder);
         }
 
         private void OnMouseWheel(object sender, MouseWheelEventArgs e)
@@ -37,7 +46,7 @@ namespace WpfVisualizer
             }
         }
 
-        private static ControlInfo[] Dump(Window win)
+        private static ControlInfo[] Dump(Window win, string workFolderPath)
         {
             var sb = new List<ControlInfo>();
             var winc = new ControlInfo
@@ -47,11 +56,11 @@ namespace WpfVisualizer
                 Size = new Size(win.ActualWidth, win.ActualHeight)
             };
             sb.Add(winc);
-            DumpChild(win, 1, winc, sb, win);
+            DumpChild(win, 1, winc, sb, win, workFolderPath);
             return sb.ToArray();
         }
 
-        private static void DumpChild(DependencyObject target, int indent, ControlInfo parent, List<ControlInfo> result, Window win)
+        private static void DumpChild(DependencyObject target, int indent, ControlInfo parent, List<ControlInfo> result, Window win, string workFolderPath)
         {
             try
             {
@@ -61,19 +70,19 @@ namespace WpfVisualizer
                     var frameworkElement = child as Visual;
                     if (frameworkElement == null)
                         continue;
-                    DumpControl(frameworkElement, indent, result, win);
+                    DumpControl(frameworkElement, indent, result, win, workFolderPath);
                     var cc = result.Last();
                     parent.Children.Add(cc);
-                    DumpChild(frameworkElement, indent + 1, cc, result, win);
+                    DumpChild(frameworkElement, indent + 1, cc, result, win, workFolderPath);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //                MessageBox.Show(ex.ToString());
+                                MessageBox.Show(ex.ToString());
             }
         }
 
-        private static void DumpControl(DependencyObject dep, int indent, List<ControlInfo> result, Window win)
+        private static void DumpControl(DependencyObject dep, int indent, List<ControlInfo> result, Window win, string workFolderPath)
         {
             var fe = dep as FrameworkElement;
             var control = dep as Control;
@@ -89,13 +98,14 @@ namespace WpfVisualizer
                 Point locationFromWindow = fe.TranslatePoint(new Point(0, 0), win);
                 ci.Position = locationFromWindow;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Debug.WriteLine(ex);
             }
             if (fe != null)
             {
                 ci.Size = new Size(fe.ActualWidth, fe.ActualHeight);
-                ci.TexturePath = RenderControl(fe, ci);
+                ci.TexturePath = RenderControl(fe, ci, workFolderPath);
             }
 
             if (control != null)
@@ -107,7 +117,7 @@ namespace WpfVisualizer
 
         private static int index = 1;
 
-        private static string RenderControl(FrameworkElement control, ControlInfo ci)
+        private static string RenderControl(FrameworkElement control, ControlInfo ci, string workFolderPath)
         {
             var width = (int)control.ActualWidth;
             var height = (int)control.ActualHeight;
@@ -119,7 +129,7 @@ namespace WpfVisualizer
             // Encoding the RenderBitmapTarget as a PNG file.
             PngBitmapEncoder png = new PngBitmapEncoder();
             png.Frames.Add(BitmapFrame.Create(rtb));
-            var path = @"c:\temp22\" + ci.ControlType + index++ + ".png";
+            var path = Path.Combine(workFolderPath, ci.ControlType + index++ + ".png");
             using (Stream stm = File.Create(path))
             {
                 png.Save(stm);
@@ -141,7 +151,7 @@ namespace WpfVisualizer
 
                 dynamic win = app.Type<Application>().Current.MainWindow;
                 WindowsAppExpander.LoadAssemblyFromFile(app, GetType().Assembly.Location);
-                var sb = (ControlInfo[])GetInvoker(app).Dump(win);
+                var sb = (ControlInfo[])GetInvoker(app).Dump(win, _temporaryImageStoreFolder);
                 Map = new Dictionary<ControlInfo, WirePolyline>();
                 ViewPort.Children.Clear();
                 var root = sb.First();
@@ -233,6 +243,8 @@ namespace WpfVisualizer
         {
             BitmapImage bi = new BitmapImage();
             bi.BeginInit();
+            bi.CacheOption = BitmapCacheOption.OnLoad;
+            bi.CreateOptions = BitmapCreateOptions.None;
             bi.UriSource = new Uri(p, UriKind.Absolute);
             bi.EndInit();
             bi.Freeze();
@@ -313,6 +325,20 @@ namespace WpfVisualizer
         {
             var dlg = new LicenseWindow();
             dlg.ShowDialog();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (Directory.Exists(_temporaryImageStoreFolder))
+            {
+                ViewPort.Children.Clear();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+
+                var dir = new DirectoryInfo(_temporaryImageStoreFolder);
+                dir.Delete(true);
+            }
         }
     }
 }
