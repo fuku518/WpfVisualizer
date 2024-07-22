@@ -2,7 +2,7 @@ WpfVisualizer
 =============
 WpfVisualize is WPF application control layer visualization tool.
 
-![Alt screen shot](http://img.f.hatena.ne.jp/images/fotolife/f/fkmt5/20141220/20141220124658.png "Screen shot")
+![Alt screen shot](https://github.com/user-attachments/assets/012a970c-5f40-49fb-86dc-62ea30f1b7af "Screen shot")
 
 ##What you need to build this sample
 =============
@@ -29,10 +29,11 @@ This project is experimental implment. And probably so buggy.
 * press F1 key to reset camera position
 * select control in left side tree panel then draw 3d element in red
 
-![Alt screen shot](http://img.f.hatena.ne.jp/images/fotolife/f/fkmt5/20141220/20141220141514.png "Screen shot")
-![Alt screen shot](http://img.f.hatena.ne.jp/images/fotolife/f/fkmt5/20141220/20141220141515.png "Screen shot")
-![Alt screen shot](http://img.f.hatena.ne.jp/images/fotolife/f/fkmt5/20141220/20141220141516.png "Screen shot")
-![Alt screen shot](http://img.f.hatena.ne.jp/images/fotolife/f/fkmt5/20141220/20141220142119.png "Screen shot")
+![Alt screen shot](https://github.com/user-attachments/assets/fa18301a-b2c6-4cb6-a515-2e710577acce "Screen shot")
+![Alt screen shot](https://github.com/user-attachments/assets/e0ccf4db-8c15-4272-84d5-8355c5692d20 "Screen shot")
+![Alt screen shot](https://github.com/user-attachments/assets/290d40c3-b966-4086-81c0-3165ccb49a20 "Screen shot")
+![Alt screen shot](https://github.com/user-attachments/assets/0434d528-876b-437f-abf3-6af74106d9b0 "Screen shot")
+![Alt screen shot](https://github.com/user-attachments/assets/bdf1862b-e93d-4096-9ff0-31b625ca50c9 "Screen shot")
 
 
 
